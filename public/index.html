@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Подпись</title>
+    <meta
+      name="description"
+      content="Игра на смешные подписи к фотографиям. Можно играть одному или с друзьями."
+    />
+    <link rel="icon" href="/favicon.svg" />
+    <link rel="stylesheet" href="/style.css" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="Подпись — главная"
+        ><span class="brand-mark">”</span>подпись<span class="brand-dot"
+          >.</span
+        ></a
+      >
+      <nav>
+        <button id="group-create" class="nav-button">Играть компанией</button
+        ><button id="share-open" class="nav-button" hidden>
+          Другие устройства ↗</button
+        ><button id="history-open" hidden class="nav-button">
+          Коллекция <span id="history-count">0</span></button
+        ><button id="settings-open" class="connection">
+          <i id="connection-dot"></i
+          ><span id="connection-text">Подключение</span
+          ><span aria-hidden="true">↗</span>
+        </button>
+      </nav>
+    </header>
+    <main>
+      <section class="intro">
+        <h1>Подпись к фото</h1>
+        <p>Придумай смешную подпись до 50 символов.</p>
+      </section>
+      <div class="game-grid">
+        <section class="play-card" aria-label="Текущий раунд">
+          <div class="photo-wrap">
+            <img id="photo" alt="Фотография для твоей подписи" hidden />
+            <div id="photo-placeholder">
+              <span class="placeholder-icon">↗</span
+              ><strong>Загрузка фото…</strong><span></span>
+            </div>
+            <button
+              id="skip-photo"
+              class="photo-skip"
+              title="Новая случайная фотография"
+            >
+              Другое фото ↻
+            </button>
+          </div>
+          <div class="photo-credit">
+            <a id="photo-source" target="_blank" rel="noreferrer"
+              >Источник фото</a
+            >
+          </div>
+          <form id="caption-form">
+            <div class="field-label">
+              <label for="caption">Твоя подпись</label
+              ><span id="counter">0 / 50</span>
+            </div>
+            <input id="caption" autocomplete="off" aria-describedby="counter" />
+            <div class="submit-row">
+              <button id="judge-button" class="primary" disabled>
+                Оценить подпись
+              </button>
+            </div>
+          </form>
+          <div id="error" class="error" role="alert" hidden></div>
+          <p id="photo-selection-note" class="muted" role="status"></p>
+          <div class="under-card">
+            <button id="upload-button" class="text-button">
+              ＋ Своя фотография</button
+            ><input
+              id="file-input"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              hidden
+            />
+          </div>
+        </section>
+        <aside class="judge-panel" aria-label="Оценка судьи">
+          <div class="judge-heading"><h2>Оценка</h2></div>
+          <div id="judge-idle"><p>Зачёт от 50 баллов.</p></div>
+          <div id="judge-loading" hidden>
+            <p>Оцениваем подпись…</p>
+            <span id="elapsed" class="tiny-label">0 СЕК</span>
+          </div>
+          <div id="verdict" hidden aria-live="polite">
+            <div class="score-line">
+              <strong id="score">0</strong><span>/ 100</span><b id="passed"></b>
+            </div>
+            <p id="judge-comment" class="judge-comment"></p>
+            <p id="explanation"></p>
+            <div id="breakdown" class="breakdown"></div>
+            <div class="feedback">
+              <span>Согласен с оценкой?</span>
+              <div>
+                <button data-feedback="high">Завысил</button
+                ><button data-feedback="agree">В точку</button
+                ><button data-feedback="low">Занизил</button>
+              </div>
+              <label for="feedback-comment">Почему это смешно?</label
+              ><textarea
+                id="feedback-comment"
+                rows="3"
+                maxlength="1000"
+              ></textarea
+              ><button id="save-feedback" type="button">
+                Сохранить пояснение</button
+              ><button id="rejudge" type="button">Переоценить</button
+              ><small id="rejudge-note" role="status"></small
+              ><small id="feedback-note" role="status"></small>
+            </div>
+            <button id="next-round" class="primary next">
+              Следующий кадр <span>→</span>
+            </button>
+          </div>
+        </aside>
+      </div>
+      <section class="bottom-row">
+        <div class="session-stat">
+          <strong id="best-score">—</strong><span>личный рекорд</span>
+        </div>
+      </section>
+    </main>
+    <dialog id="settings-dialog">
+      <form id="settings-form">
+        <div class="dialog-heading">
+          <div><h2>Настройки</h2></div>
+          <button
+            type="button"
+            class="close"
+            data-close="settings-dialog"
+            aria-label="Закрыть"
+          >
+            ×
+          </button>
+        </div>
+        <p class="muted">
+          Запусти сервер LM Studio и выбери модель с поддержкой изображений.
+        </p>
+        <label for="endpoint">Адрес LM Studio</label
+        ><input id="endpoint" required value="http://127.0.0.1:1234/v1" /><label
+          for="token"
+          >API-токен, если включена авторизация</label
+        ><input
+          id="token"
+          type="password"
+          autocomplete="off"
+          placeholder="Не требуется по умолчанию"
+        /><small
+          >Токен хранится только до остановки игры. Пустое поле сбрасывает
+          токен.</small
+        ><label for="model">Модель</label>
+        <div class="model-row">
+          <input
+            id="model"
+            list="models"
+            placeholder="Выбери или вставь идентификатор модели"
+          /><datalist id="models"></datalist
+          ><button id="check-models" type="button" class="secondary">
+            Проверить связь
+          </button>
+        </div>
+        <small id="model-status" role="status"></small
+        ><label for="photoProvider">Источник фотографий</label
+        ><select id="photoProvider">
+          <option value="auto">Автоматически — российские фотостоки</option>
+          <option value="rupixel">RuPixel — разные темы</option>
+          <option value="perfectstock">PerfectStock — разные темы</option>
+          <option value="picsum">Lorem Picsum — разные фотографии</option>
+          <option value="yandex">
+            Яндекс.Диск — фото из открытой папки
+          </option></select
+        ><label
+          ><input id="smartPhotos" type="checkbox" checked /> Подбирать фото по
+          содержанию</label
+        ><small>Модель проверяет до трёх кадров. Это замедляет загрузку.</small
+        ><label for="yandexFolder"
+          >Публичная папка Яндекс.Диска
+          <span class="optional">необязательно</span></label
+        ><input
+          id="yandexFolder"
+          type="url"
+          placeholder="https://disk.yandex.ru/d/…"
+        /><small>Положи фото прямо в папку.</small
+        ><label for="strictness">Строгость оценки</label
+        ><select id="strictness">
+          <option value="normal">Обычная</option>
+          <option value="kind">Мягкая</option>
+          <option value="hard">Строгая</option></select
+        ><label for="memes"
+          >Справочник мемов <span class="optional">необязательно</span></label
+        ><textarea
+          id="memes"
+          rows="4"
+          maxlength="12000"
+          placeholder="Название мема — что означает и в каких ситуациях его используют. Можно добавить свои примеры."
+        ></textarea
+        ><small></small>
+        <div id="settings-error" class="error" role="alert" hidden></div>
+        <button class="primary save-button" type="submit">
+          Сохранить настройки <span>✓</span>
+        </button>
+      </form>
+    </dialog>
+    <dialog id="history-dialog">
+      <div class="dialog-heading">
+        <div><h2>Коллекция</h2></div>
+        <button class="close" data-close="history-dialog" aria-label="Закрыть">
+          ×
+        </button>
+      </div>
+      <div class="history-toolbar">
+        <span>Последние 500 подписей · на этом ПК</span
+        ><button id="export-history" class="text-button">Скачать JSON ↓</button>
+      </div>
+      <div id="history-list"></div>
+    </dialog>
+    <dialog id="share-dialog">
+      <div class="dialog-heading">
+        <div><h2>Доступ с других устройств</h2></div>
+        <button class="close" data-close="share-dialog" aria-label="Закрыть">
+          ×
+        </button>
+      </div>
+      <p class="muted">
+        Для доступа по ссылке оставь ПК, игру и LM Studio включёнными.
+      </p>
+      <p id="share-status" role="status">Внешний доступ выключен.</p>
+      <label for="share-provider">Соединение</label
+      ><select id="share-provider">
+        <option value="tuna">Tuna</option>
+        <option value="localhost">localhost.run · запасной</option>
+      </select>
+      <p class="muted">
+        Для Tuna один раз запусти setup-tuna.cmd в папке игры и войди в аккаунт.
+      </p>
+      <label for="share-link">Твоя личная ссылка</label
+      ><textarea
+        id="share-link"
+        rows="3"
+        readonly
+        spellcheck="false"
+        placeholder="Здесь появится новая ссылка"
+      ></textarea>
+      <div class="share-actions">
+        <button id="share-copy" class="primary" disabled>
+          Скопировать ссылку</button
+        ><button id="share-create" class="secondary">Создать ссылку</button
+        ><button id="share-stop" class="secondary" disabled>
+          Отключить доступ
+        </button>
+      </div>
+      <small id="share-copy-note" role="status"></small>
+      <p class="muted">
+        По ссылке можно войти в игру. Создание новой ссылки отключает старую.
+      </p>
+    </dialog>
+  </body>
+</html>

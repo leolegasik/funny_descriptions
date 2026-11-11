@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Подпись · компания</title>
+    <link rel="stylesheet" href="/group.css" />
+    <script defer src="/group.js"></script>
+  </head>
+  <body>
+    <main>
+      <header>
+        <div class="brand">
+          <h1>подпись<span>．</span></h1>
+        </div>
+        <button id="copy">Копировать приглашение</button
+        ><button id="leave" class="quiet" hidden>Выйти</button
+        ><button id="create">Новая комната</button>
+      </header>
+      <input id="link" readonly aria-label="Ссылка для друзей" />
+      <p id="notice"></p>
+      <p id="error" role="alert"></p>
+      <section id="gate" class="gate" hidden>
+        <span class="gate-icon">◷</span>
+        <h2 id="gate-title"></h2>
+        <p id="gate-text"></p>
+      </section>
+      <form id="join" class="join-card" hidden>
+        <h2>Вход в комнату</h2>
+        <label
+          >Твой ник
+          <input
+            id="name"
+            maxlength="20"
+            required
+            autocomplete="nickname" /></label
+        ><button>Войти в лобби</button>
+      </form>
+      <section id="game" hidden>
+        <div class="section-heading">
+          <h2 id="status"></h2>
+          <span id="phase-clock" class="pill"></span>
+        </div>
+        <div id="players"></div>
+        <section id="setup" hidden>
+          <label
+            >Раунды
+            <select id="count">
+              <option>5</option>
+              <option>10</option>
+              <option>20</option>
+            </select></label
+          ><label
+            >Судья
+            <select id="style">
+              <option value="normal">Справедливый</option>
+              <option value="kind">Добродушный</option>
+              <option value="hard">Строгий</option>
+            </select></label
+          ><button id="start">Начать игру</button>
+        </section>
+        <p id="waiting"></p>
+        <img id="photo" hidden alt="Общий кадр" />
+        <form id="answer" hidden>
+          <p id="timer"></p>
+          <input
+            id="caption"
+            maxlength="100"
+            placeholder="Подпись до 50 символов"
+            autocomplete="off"
+          /><button id="submit">Отправить ответ</button>
+        </form>
+        <button id="retry" hidden>Повторить после ошибки</button
+        ><button id="again" hidden>Сыграть снова</button>
+        <section id="ranking"></section>
+        <section id="gallery" hidden aria-label="Лучшие подписи игры">
+          <div class="section-heading">
+            <div>
+              <h2>Лучшие подписи</h2>
+            </div>
+            <span id="gallery-position" class="pill"></span>
+          </div>
+          <img id="gallery-photo" alt="Фото выбранного раунда" hidden />
+          <p id="gallery-status" role="status"></p>
+          <div id="gallery-winners"></div>
+          <div class="gallery-nav">
+            <button id="gallery-prev" aria-label="Предыдущий раунд">
+              ← Назад</button
+            ><label
+              >Раунд
+              <select id="gallery-select"></select></label
+            ><button id="gallery-next" aria-label="Следующий раунд">
+              Дальше →
+            </button>
+          </div>
+        </section>
+        <h2 id="results-title" hidden></h2>
+        <div id="results"></div>
+      </section>
+    </main>
+  </body>
+</html>
